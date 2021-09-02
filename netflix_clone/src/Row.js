@@ -16,13 +16,22 @@ function Row(props) {
       setTrailerUrl("");
     } else {
       // movieTrailor inbuilt in youtube react //retruns promise
-      movieTrailer(movie?.name || "")
-        .then((url) => {
-          // https://www.youtube.com/watch?v=EzSzSwbWRJc
-          const urlParams = new URLSearchParams(new URL(url).search); //gives the last id part
-          setTrailerUrl(urlParams.get("v")); //gives only id
-        })
-        .catch((err) => console.log(err));
+      if (!movie.name) movie.name = movie.title;
+      // console.log(movie);
+      if (movie.name) {
+        movieTrailer(movie?.name || movie?.title || "")
+          .then((url) => {
+            // https://www.youtube.com/watch?v=EzSzSwbWRJc
+            if (!url) setTrailerUrl("GV3HUDMQ-F8");
+            const urlParams = new URLSearchParams(new URL(url)?.search); //gives the last id part
+            console.log("f", urlParams);
+            console.log(urlParams.get("v"));
+            setTrailerUrl(
+              `${urlParams.get("v") ? urlParams.get("v") : "GV3HUDMQ-F8"}`
+            ); //gives only id
+          })
+          .catch((err) => console.log(err));
+      }
     }
   };
 
@@ -46,17 +55,19 @@ function Row(props) {
   console.log(movies);
   return (
     <div className="row">
-      <h2>{title}</h2>
+      <h2 className="title">{title}</h2>
       <div className="row__posters">
         {movies.map((movie) => (
           <img
             onClick={() => handleClick(movie)}
             key={movie.id}
-            className={`row__poster ${isLargeRow && "row__posterLarge"}`}
+            className={`row__poster ${isLargeRow ? "row__posterLarge" : ""}`}
             src={
               isLargeRow
-                ? `${base_URL}${movie.poster_path}`
-                : `${base_URL}${movie.backdrop_path}`
+                ? `${base_URL}${movie?.poster_path}`
+                : `${base_URL}${
+                    movie?.backdrop_path || "G3vrVlsqsNPSYvyoG2lTRxVGom.jpg"
+                  }`
             }
             alt={movie.name}
           />
